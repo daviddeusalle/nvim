@@ -1,37 +1,34 @@
-vim.g.base46_cache = vim.fn.stdpath "data" .. "/nvchad/base46/"
-vim.g.mapleader = " "
-
--- bootstrap lazy and all plugins
-local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
-
-if not vim.uv.fs_stat(lazypath) then
-  local repo = "https://github.com/folke/lazy.nvim.git"
-  vim.fn.system { "git", "clone", "--filter=blob:none", repo, "--branch=stable", lazypath }
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", -- latest stable release
+    lazypath,
+  })
 end
-
 vim.opt.rtp:prepend(lazypath)
 
-local lazy_config = require "configs.lazy"
+vim.opt.fillchars:append({ eob = " " })
+vim.opt.number = true
+vim.opt.relativenumber = true
 
--- load plugins
-require("lazy").setup({
-  {
-    "NvChad/NvChad",
-    lazy = false,
-    branch = "v2.5",
-    import = "nvchad.plugins",
-  },
+vim.keymap.set('n','y','"+y')
+vim.keymap.set('n','yy','"+yy')
+vim.keymap.set('n','Y','"+Y')
+vim.keymap.set('x','y','"+y')
+vim.keymap.set('x','Y','"+Y')
+require("vim-options")
+require("lazy").setup("plugins")
 
-  { import = "plugins" },
-}, lazy_config)
 
--- load theme
-dofile(vim.g.base46_cache .. "defaults")
-dofile(vim.g.base46_cache .. "statusline")
 
-require "options"
-require "nvchad.autocmds"
-
-vim.schedule(function()
-  require "mappings"
-end)
+vim.diagnostic.config({
+  virtual_text = true,  -- muestra texto del error inline
+  signs = true,         -- muestra iconos en el margen
+  underline = true,     -- subraya el texto con errores
+  update_in_insert = false,
+  severity_sort = true,
+})
